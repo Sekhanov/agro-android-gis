@@ -41,6 +41,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 //eeeeeeeeeeeeeeeeeeeeeeeeeeee
+//RERE
 public class MapActivity extends AppCompatActivity {
     private MapView mMapView;
     private List<Overlay> mOverlays;
