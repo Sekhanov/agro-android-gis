@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/gis_object"
+        android:title="Объект"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/polyline"
+                android:title="полилиния"/>
+            <item
+                android:id="@+id/polygon"
+                android:title="полигон"/>
+            <item
+                android:id="@+id/clear_last_geopoint"
+                android:title="Удалить последнюю геоточку"/>
+            <item
+                android:id="@+id/clear_all_geo_points"
+                android:title="удалить все геоточки"
+                app:showAsAction="ifRoom"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/GPS"
+        android:title="GPS"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/GPS_coordinates"
+                android:title="Координаты GPS"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/layer"
+        android:title="Слои"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/delete_marker"
+                android:title="Удалить последний слой"/>
+            <item
+                android:id="@+id/delete_all_markers"
+                android:title="Удалить все макеры"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/create_dirs"
+        android:title="Создать папки"/>
+    <item
+        android:id="@+id/open_kml"
+        android:title="открыть kml"/>
+    <item
+        android:id="@+id/save"
+        android:title="сохранить"
+        app:showAsAction="never"/>
+</menu>
