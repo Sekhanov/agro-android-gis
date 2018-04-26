@@ -1,6 +1,7 @@
 package ru.agroexpert2007.aegis;
 
 import android.Manifest;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,6 +13,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -40,13 +42,14 @@ import org.osmdroid.views.overlay.Polyline;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-//eeeeeeeeeeeeeeeeeeeeeeeeeeee
-//RERE
-public class MapActivity extends AppCompatActivity {
+
+public class MapActivity extends AppCompatActivity implements FileSaveDialog.DataExchange {
     private MapView mMapView;
+    private DialogFragment mDialogFragment;
     private List<Overlay> mOverlays;
     private List<GeoPoint> mGeoPoints;
     private KmlDocument mKmlDocumentToSave;
+    private File mDirectoryToSave;
     private File mFileToSave;
     private IMapController mapController;
     private LocationManager mLocationManager;
@@ -78,8 +81,7 @@ public class MapActivity extends AppCompatActivity {
                 getKmlsFromDefaultDir();
                 return true;
             case R.id.save:
-                mKmlDocumentToSave.saveAsKML(mFileToSave);
-                Log.d("myTag", "Exit item pressed");
+                mDialogFragment.show(getFragmentManager(), "fsDlg");
                 return true;
             case R.id.polyline:
                 Polyline polyline = new Polyline(mMapView);
@@ -110,7 +112,8 @@ public class MapActivity extends AppCompatActivity {
             case R.id.clear_last_geopoint:
                 mGeoPoints.remove(mGeoPoints.size() - 1);
             case R.id.delete_all_markers:
-               /* OverlaysHandler.removeAllMarkers(mOverlays);*/
+                OverlaysHandler.removeAllMarkers(mOverlays);
+                mMapView.invalidate();
             default:
                 return super.onOptionsItemSelected(item);
 
@@ -137,12 +140,13 @@ public class MapActivity extends AppCompatActivity {
         mGeoPoints = new ArrayList<>();
         mKmlDocumentToSave = new KmlDocument();
         File sdDir = Environment.getExternalStorageDirectory();
-        mFileToSave = new File(sdDir, "gis/saved/my_file.kml");
+/*        mDirectoryToSave = new File(sdDir, "gis/saved/my_file.kml");*/
+        mDirectoryToSave = new File(sdDir, "gis/saved/");
 
         setContentView(R.layout.activity_map);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
-
+        mDialogFragment = new FileSaveDialog();
         mMapView = (MapView) findViewById(R.id.map);
         mMapView.setTileSource(TileSourceFactory.MAPNIK);
         mMapView.setBuiltInZoomControls(true);
@@ -284,5 +288,14 @@ public class MapActivity extends AppCompatActivity {
         mMapView.invalidate();
     }
 
-
+    /**
+     *
+     * @param s возвращает значение из file FileToSaveDialog
+     */
+    @Override
+    public void exchange(String s) {
+        mFileToSave = new File(mDirectoryToSave, s + ".kml");
+        mKmlDocumentToSave.saveAsKML(mFileToSave);
+        Log.d("skhanov", s);
+    }
 }
