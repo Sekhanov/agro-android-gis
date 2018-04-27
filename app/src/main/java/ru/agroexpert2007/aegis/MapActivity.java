@@ -13,7 +13,6 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
-
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -22,9 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-
 import org.osmdroid.api.IMapController;
-
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
@@ -52,10 +49,8 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
     private File mDirectoryToSave;
     private File mFileToSave;
     private IMapController mapController;
-    private LocationManager mLocationManager;
-    private LocationListener mLocationListener;
-    private double mLatitudeFormGPS;
-    private double mLongitudeFromGPS;
+    LocationManager mLocationManager;
+    LocationListener mLocationListener;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -67,6 +62,13 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.finish_gps_track:
+                mLocationManager.removeUpdates(mLocationListener);
+                mMapView.invalidate();
+                return true;
+            case R.id.start_gps_track:
+                startGPSTrack();
+                return true;
             case R.id.delete_marker:
                 OverlaysHandler.removeOverlay(mOverlays, mOverlays.size() - 1);
                 mMapView.invalidate();
@@ -140,7 +142,6 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
         mGeoPoints = new ArrayList<>();
         mKmlDocumentToSave = new KmlDocument();
         File sdDir = Environment.getExternalStorageDirectory();
-/*        mDirectoryToSave = new File(sdDir, "gis/saved/my_file.kml");*/
         mDirectoryToSave = new File(sdDir, "gis/saved/");
 
         setContentView(R.layout.activity_map);
@@ -156,7 +157,7 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
         mapController.setZoom(11.0);
         GeoPoint startPoint = new GeoPoint(56.8561, 41.3892);
         mapController.setCenter(startPoint);
-
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         mOverlays = mMapView.getOverlays();
         setTapEventHandler();
 
@@ -252,14 +253,20 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
         checkPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.INTERNET, Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_NETWORK_STATE});
-        GeoPoint geoPointGPS = null;
-        Marker markerGPS = new Marker(mMapView);
-        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        mLocationListener = new LocationListener() {
+
+        LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                mLatitudeFormGPS = location.getLatitude();
-                mLongitudeFromGPS = location.getLongitude();
+                double latitudeFormGPS = location.getLatitude();
+                double longitudeFromGPS = location.getLongitude();
+                GeoPoint geoPointGPS = new GeoPoint(latitudeFormGPS, longitudeFromGPS);
+                Marker markerGPS = new Marker(mMapView);
+                mapController.setCenter(geoPointGPS);
+                markerGPS.setPosition(geoPointGPS);
+                markerGPS.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                markerGPS.setTitle("GPS Marker " + mOverlays.size());
+                mOverlays.add(markerGPS);
+                mMapView.invalidate();
             }
 
             @Override
@@ -278,14 +285,48 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
                 startActivity(intent);
             }
         };
-        mLocationManager.requestLocationUpdates("gps", 5, 10, mLocationListener);
-        geoPointGPS = new GeoPoint(mLatitudeFormGPS, mLongitudeFromGPS);
-        mapController.setCenter(geoPointGPS);
-        markerGPS.setPosition(geoPointGPS);
-        markerGPS.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        markerGPS.setTitle("ПM " + mOverlays.size());
-        mOverlays.add(markerGPS);
-        mMapView.invalidate();
+        mLocationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+    }
+
+    private void startGPSTrack() {
+        checkPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.INTERNET, Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_NETWORK_STATE});
+
+        mLocationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                double latitudeFormGPS = location.getLatitude();
+                double longitudeFromGPS = location.getLongitude();
+                GeoPoint geoPointGPS = new GeoPoint(latitudeFormGPS, longitudeFromGPS);
+                mGeoPoints.add(geoPointGPS);
+                mapController.setCenter(geoPointGPS);
+                Marker markerGPS = new Marker(mMapView);
+                markerGPS.setPosition(geoPointGPS);
+                markerGPS.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                markerGPS.setTitle("GPS Marker " + mOverlays.size());
+                mOverlays.add(markerGPS);
+                mMapView.invalidate();
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        };
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5, 20, mLocationListener);
+
     }
 
     /**

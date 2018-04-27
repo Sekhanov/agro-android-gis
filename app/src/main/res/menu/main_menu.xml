@@ -29,7 +29,13 @@
         <menu>
             <item
                 android:id="@+id/GPS_coordinates"
-                android:title="Координаты GPS"/>
+                android:title="Координаты локации"/>
+            <item
+                android:id="@+id/start_gps_track"
+                android:title="Начать GPS трек"/>
+            <item
+                android:id="@+id/finish_gps_track"
+                android:title="Закончить GPS трек"/>
         </menu>
     </item>
     <item
