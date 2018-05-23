@@ -25,9 +25,11 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.MapTileIndex;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.MapEventsOverlay;
@@ -51,6 +53,25 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
     private IMapController mapController;
     LocationManager mLocationManager;
     LocationListener mLocationListener;
+
+    /*
+    тайл с гугла (нелицензионный)
+     */
+    public static final OnlineTileSourceBase GOOGLE_HYBRID = new XYTileSource("Google-Hybrid",
+            0, 19, 256, ".png", new String[] {
+            "http://mt0.google.com",
+            "http://mt1.google.com",
+            "http://mt2.google.com",
+            "http://mt3.google.com",
+
+    }) {
+        @Override
+        public String getTileURLString(final long pMapTileIndex) {
+            return getBaseUrl() + "/vt/lyrs=y&x=" + MapTileIndex.getX(pMapTileIndex) + "&y=" + MapTileIndex.getY(pMapTileIndex) + "&z=" + MapTileIndex.getZoom(pMapTileIndex);
+        }
+    };
+
+    OnlineTileSourceBase mGoogleOnlineTileSourceBase;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -149,7 +170,18 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
         setSupportActionBar(myToolbar);
         mDialogFragment = new FileSaveDialog();
         mMapView = (MapView) findViewById(R.id.map);
-        mMapView.setTileSource(TileSourceFactory.MAPNIK);
+
+/*
+        mGoogleOnlineTileSourceBase = new OnlineTileSourceBase() {
+            @Override
+            public String getTileURLString(long pMapTileIndex) {
+                return null;
+            }
+        };
+*/
+
+        mMapView.setTileSource(GOOGLE_HYBRID);
+//        mMapView.setTileSource(TileSourceFactory.MAPNIK);
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
 
@@ -325,7 +357,7 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
                 startActivity(intent);
             }
         };
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5, 20, mLocationListener);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, mLocationListener);
 
     }
 

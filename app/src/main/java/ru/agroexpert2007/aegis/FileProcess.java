@@ -5,7 +5,9 @@ import java.util.ArrayList;
 
 public class FileProcess {
 
-
+    /*
+    Все файлы из директории рекурсивно
+     */
     public static ArrayList<File> getFileList(File parentDir) {
         ArrayList<File> inFiles = new ArrayList<>();
         File[] files = parentDir.listFiles();

@@ -3,9 +3,6 @@ package ru.agroexpert2007.aegis;
 import android.util.Log;
 
 import org.osmdroid.views.overlay.Overlay;
-import org.osmdroid.views.overlay.OverlayWithIW;
-
-import java.util.Iterator;
 import java.util.List;
 
 public class OverlaysHandler {
