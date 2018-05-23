@@ -5,7 +5,7 @@
     <item
         android:id="@+id/gis_object"
         android:title="Объект"
-        app:showAsAction="always">
+        app:showAsAction="ifRoom">
         <menu>
             <item
                 android:id="@+id/polyline"
@@ -25,7 +25,7 @@
     <item
         android:id="@+id/GPS"
         android:title="GPS"
-        app:showAsAction="always">
+        app:showAsAction="ifRoom">
         <menu>
             <item
                 android:id="@+id/GPS_coordinates"
@@ -41,7 +41,7 @@
     <item
         android:id="@+id/layer"
         android:title="Слои"
-        app:showAsAction="always">
+        app:showAsAction="ifRoom">
         <menu>
             <item
                 android:id="@+id/delete_marker"
@@ -49,6 +49,18 @@
             <item
                 android:id="@+id/delete_all_markers"
                 android:title="Удалить все макеры"/>
+        </menu>
+    </item>
+    <item android:id="@+id/tile"
+        android:title="Тип карты"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/GOOGLE_HYBRID"
+                android:title="Спутниковая"/>
+            <item
+                android:id="@+id/MAPNIK"
+                android:title="Топографическая"/>
         </menu>
     </item>
     <item

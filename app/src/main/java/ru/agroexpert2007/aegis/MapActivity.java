@@ -20,12 +20,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.Window;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
@@ -137,6 +139,13 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
             case R.id.delete_all_markers:
                 OverlaysHandler.removeAllMarkers(mOverlays);
                 mMapView.invalidate();
+                return  true;
+            case R.id.MAPNIK:
+                mMapView.setTileSource(TileSourceFactory.MAPNIK);
+                return true;
+            case R.id.GOOGLE_HYBRID:
+                mMapView.setTileSource(GOOGLE_HYBRID);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
 
@@ -168,17 +177,9 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
         setContentView(R.layout.activity_map);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+       /* getSupportActionBar().setDisplayShowTitleEnabled(false);*/
         mDialogFragment = new FileSaveDialog();
         mMapView = (MapView) findViewById(R.id.map);
-
-/*
-        mGoogleOnlineTileSourceBase = new OnlineTileSourceBase() {
-            @Override
-            public String getTileURLString(long pMapTileIndex) {
-                return null;
-            }
-        };
-*/
 
         mMapView.setTileSource(GOOGLE_HYBRID);
 //        mMapView.setTileSource(TileSourceFactory.MAPNIK);
