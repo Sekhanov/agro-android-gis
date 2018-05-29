@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
+import android.view.WindowManager;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.kml.KmlDocument;
@@ -174,6 +175,7 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
         File sdDir = Environment.getExternalStorageDirectory();
         mDirectoryToSave = new File(sdDir, "gis/saved/");
 
+
         setContentView(R.layout.activity_map);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -182,9 +184,10 @@ public class MapActivity extends AppCompatActivity implements FileSaveDialog.Dat
         mMapView = (MapView) findViewById(R.id.map);
 
         mMapView.setTileSource(GOOGLE_HYBRID);
-//        mMapView.setTileSource(TileSourceFactory.MAPNIK);
         mMapView.setBuiltInZoomControls(true);
         mMapView.setMultiTouchControls(true);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mapController = mMapView.getController();
         mapController.setZoom(11.0);
